@@ -1,0 +1,91 @@
+/* the color names used all over the page (dark theme) */
+:root{
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --green:#3fb950; --red:#f85149;
+}
+
+/* removes the browser's default spacing on everything, so we start clean */
+*{box-sizing:border-box; margin:0; padding:0;}
+
+/* the whole page: dark background, everything centered */
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:24px 16px;
+}
+
+/* the stopwatch card in the middle of the page */
+.card{
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:32px 28px; width:100%; max-width:400px; text-align:center;
+}
+
+/* the "Stopwatch" title */
+h1{font-size:1.3rem; font-weight:600; margin-bottom:16px;}
+
+/* the little clock symbol in the title, blue */
+h1 span{color:var(--accent);}
+
+/* the big time digits */
+#display{
+  font-size:3rem; font-weight:600; letter-spacing:2px;
+  font-variant-numeric:tabular-nums; margin-bottom:6px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+
+/* the small milliseconds part of the time, grey and smaller */
+#display small{font-size:1.4rem; color:var(--muted);}
+
+/* the small state label under the time (Ready / Running / Stopped) */
+#state{color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:20px; min-height:1.2em;}
+
+/* the row with the Start, Lap and Reset buttons */
+.controls{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+
+/* the three buttons: they share the row equally */
+.controls button{
+  flex:1; padding:12px 0; border-radius:10px; cursor:pointer;
+  font-size:.92rem; font-weight:600; border:1px solid var(--border);
+  background:var(--bg); color:var(--text); max-width:120px;
+}
+
+/* buttons get a blue edge when you hover over them */
+.controls button:hover{border-color:var(--accent);}
+
+/* the Start button, green */
+#startBtn{background:var(--green); border-color:var(--green); color:#06230c;}
+
+/* the Start button turns into a red Stop button while running */
+#startBtn.running{background:var(--red); border-color:var(--red); color:#2e0606;}
+
+/* the laps area: scrolls if there are many laps */
+#laps{margin-top:14px; max-height:220px; overflow-y:auto; text-align:left;}
+
+/* the laps table */
+#laps table{width:100%; border-collapse:collapse; font-size:.85rem; font-variant-numeric:tabular-nums;}
+
+/* the table header row (Lap / Lap time / Total) */
+#laps th{
+  color:var(--muted); font-weight:600; text-align:left; padding:8px 6px;
+  border-bottom:1px solid var(--border); font-size:.75rem; text-transform:uppercase; letter-spacing:.5px;
+  position:sticky; top:0; background:var(--card);
+}
+
+/* each lap's cells */
+#laps td{padding:8px 6px; border-bottom:1px solid var(--border); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+
+/* the fastest lap row shows in green */
+#laps tr.fastest td{color:var(--green);}
+
+/* the slowest lap row shows in red */
+#laps tr.slowest td{color:var(--red);}
+
+/* the "No laps yet" message shown before the first lap */
+#empty{color:var(--muted); font-size:.85rem; padding:16px 0 6px;}
+
+/* on small phone screens: tighter card, slightly smaller digits */
+@media (max-width:390px){
+  .card{padding:24px 16px;}
+  #display{font-size:2.4rem;}
+}

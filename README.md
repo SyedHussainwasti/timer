@@ -15,3 +15,9 @@ Open `index.html`. **Start**/**Stop** the clock, **Lap** to record splits
 - Laps store both the split time and the running total; highlighting compares
   split times once at least two laps exist.
 - 100% client-side, zero network requests.
+
+## Files
+
+- `index.html` — the page layout (the words and boxes you see)
+- `styles.css` — all the colors and styling, with plain-words notes
+- `app.js` — the stopwatch logic, with plain-words notes on every step

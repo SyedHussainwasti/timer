@@ -4,149 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stopwatch</title>
-<style>
-  :root{
-    --bg:#0d1117; --card:#161b22; --border:#30363d;
-    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --green:#3fb950; --red:#f85149;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background:var(--bg); color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    min-height:100vh; display:flex; align-items:center; justify-content:center;
-    padding:24px 16px;
-  }
-  .card{
-    background:var(--card); border:1px solid var(--border); border-radius:16px;
-    padding:32px 28px; width:100%; max-width:400px; text-align:center;
-  }
-  h1{font-size:1.3rem; font-weight:600; margin-bottom:16px;}
-  h1 span{color:var(--accent);}
-  #display{
-    font-size:3rem; font-weight:600; letter-spacing:2px;
-    font-variant-numeric:tabular-nums; margin-bottom:6px;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  }
-  #display small{font-size:1.4rem; color:var(--muted);}
-  #state{color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:20px; min-height:1.2em;}
-  .controls{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
-  .controls button{
-    flex:1; padding:12px 0; border-radius:10px; cursor:pointer;
-    font-size:.92rem; font-weight:600; border:1px solid var(--border);
-    background:var(--bg); color:var(--text); max-width:120px;
-  }
-  .controls button:hover{border-color:var(--accent);}
-  #startBtn{background:var(--green); border-color:var(--green); color:#06230c;}
-  #startBtn.running{background:var(--red); border-color:var(--red); color:#2e0606;}
-  #laps{margin-top:14px; max-height:220px; overflow-y:auto; text-align:left;}
-  #laps table{width:100%; border-collapse:collapse; font-size:.85rem; font-variant-numeric:tabular-nums;}
-  #laps th{
-    color:var(--muted); font-weight:600; text-align:left; padding:8px 6px;
-    border-bottom:1px solid var(--border); font-size:.75rem; text-transform:uppercase; letter-spacing:.5px;
-    position:sticky; top:0; background:var(--card);
-  }
-  #laps td{padding:8px 6px; border-bottom:1px solid var(--border); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
-  #laps tr.fastest td{color:var(--green);}
-  #laps tr.slowest td{color:var(--red);}
-  #empty{color:var(--muted); font-size:.85rem; padding:16px 0 6px;}
-  @media (max-width:390px){
-    .card{padding:24px 16px;}
-    #display{font-size:2.4rem;}
-  }
-</style>
+<!-- all the page styling lives in styles.css -->
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<!-- the stopwatch card in the middle of the page -->
 <div class="card">
+  <!-- the title -->
   <h1><span>◷</span> Stopwatch</h1>
+  <!-- the big time display -->
   <div id="display">00:00<small>.000</small></div>
+  <!-- the small state label (Ready / Running / Stopped) -->
   <div id="state">Ready</div>
+  <!-- the Start, Lap and Reset buttons -->
   <div class="controls">
     <button id="startBtn" type="button">Start</button>
     <button id="lapBtn" type="button">Lap</button>
     <button id="resetBtn" type="button">Reset</button>
   </div>
+  <!-- the laps table (filled in by the code as you hit Lap) -->
   <div id="laps"><div id="empty">No laps yet — hit Lap while running.</div></div>
 </div>
-<script>
-// ==APP-LOGIC-START==
-function Stopwatch(clock){
-  this.clock = clock || function(){ return (typeof performance!=='undefined'?performance.now():Date.now()); };
-  this.reset();
-}
-Stopwatch.prototype.reset = function(){
-  this.elapsed=0; this.running=false; this.startAt=0;
-  this.laps=[]; this.lastLapTotal=0;
-};
-Stopwatch.prototype.start = function(){
-  if(this.running) return;
-  this.running=true; this.startAt=this.clock();
-};
-Stopwatch.prototype.stop = function(){
-  if(!this.running) return;
-  this.elapsed+=this.clock()-this.startAt; this.running=false;
-};
-Stopwatch.prototype.time = function(){
-  return this.elapsed+(this.running?this.clock()-this.startAt:0);
-};
-Stopwatch.prototype.lap = function(){
-  var total=this.time();
-  var entry={n:this.laps.length+1, lapTime:total-this.lastLapTotal, total:total};
-  this.laps.push(entry); this.lastLapTotal=total;
-  return entry;
-};
-function pad2(n){return (n<10?'0':'')+n;}
-function fmtSw(ms){
-  ms=Math.max(0,Math.floor(ms));
-  var m=Math.floor(ms/60000), s=Math.floor(ms/1000)%60, milli=ms%1000;
-  return pad2(m)+':'+pad2(s)+'.'+('00'+milli).slice(-3);
-}
-function fmtSwHtml(ms){
-  ms=Math.max(0,Math.floor(ms));
-  var m=Math.floor(ms/60000), s=Math.floor(ms/1000)%60, milli=ms%1000;
-  return pad2(m)+':'+pad2(s)+'<small>.'+('00'+milli).slice(-3)+'</small>';
-}
-// ==APP-LOGIC-END==
-if(typeof document!=='undefined'){
-  var sw=new Stopwatch();
-  var display=document.getElementById('display');
-  var stateEl=document.getElementById('state');
-  var startBtn=document.getElementById('startBtn');
-  var lapsEl=document.getElementById('laps');
-  function draw(){
-    display.innerHTML=fmtSwHtml(sw.time());
-    stateEl.textContent=sw.running?'Running':(sw.time()>0?'Stopped':'Ready');
-    startBtn.textContent=sw.running?'Stop':'Start';
-    startBtn.classList.toggle('running',sw.running);
-  }
-  function drawLaps(){
-    if(!sw.laps.length){lapsEl.innerHTML='<div id="empty">No laps yet — hit Lap while running.</div>';return;}
-    var times=sw.laps.map(function(l){return l.lapTime;});
-    var fast=Math.min.apply(null,times), slow=Math.max.apply(null,times);
-    var h='<table><tr><th>Lap</th><th>Lap time</th><th>Total</th></tr>';
-    for(var i=sw.laps.length-1;i>=0;i--){
-      var l=sw.laps[i];
-      var cls=(sw.laps.length>1&&l.lapTime===fast)?' class="fastest"':((sw.laps.length>1&&l.lapTime===slow)?' class="slowest"':'');
-      h+='<tr'+cls+'><td>'+l.n+'</td><td>'+fmtSw(l.lapTime)+'</td><td>'+fmtSw(l.total)+'</td></tr>';
-    }
-    lapsEl.innerHTML=h+'</table>';
-  }
-  var raf=null;
-  function loop(){draw();raf=requestAnimationFrame(loop);}
-  startBtn.addEventListener('click',function(){
-    if(sw.running){sw.stop();cancelAnimationFrame(raf);raf=null;}
-    else{sw.start();if(!raf)loop();}
-    draw();
-  });
-  document.getElementById('lapBtn').addEventListener('click',function(){
-    if(!sw.running&&sw.time()===0) return;
-    sw.lap();drawLaps();
-  });
-  document.getElementById('resetBtn').addEventListener('click',function(){
-    if(raf){cancelAnimationFrame(raf);raf=null;}
-    sw.reset();draw();drawLaps();
-  });
-  draw();
-}
-</script>
+<!-- all the page logic lives in app.js -->
+<script src="app.js"></script>
 </body>
 </html>
